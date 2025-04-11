@@ -3,9 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def carregar_dados(caminho):  
-    return pd.read_csv(caminho)  
-
 def calcular_estatisticas(df, materia):
     media = df[materia].mean()
     mediana = df[materia].median()

@@ -10,6 +10,3 @@ if arquivo:
     materia_selecionada = st.selectbox("Escolha a matéria", df.columns[1:-1])
     fig = gerar_grafico(df, materia_selecionada)
     st.pyplot(fig)
-
-def carregar_dados_padrao():
-    return pd.read_excel("dados_simulados_turma.xlsx")  # Dados pré-carregados para teste
