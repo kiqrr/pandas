@@ -1,9 +1,4 @@
-# Bibliotecas essenciais (instale via pip)
-pip install pandas
-pip install numpy
-pip install matplotlib
-pip install seaborn
-pip install Streamlit
+pip install -r requirements.txt
 
 > Pandas: Manipulação e análise de dados tabulares (como tabelas do Excel), com funções para importar/exportar arquivos (CSV, Excel), limpar dados e calcular estatísticas.
 > NumPy: Cálculos numéricos eficientes com arrays multidimensionais, base para operações matemáticas complexas em machine learning e ciência de dados.
