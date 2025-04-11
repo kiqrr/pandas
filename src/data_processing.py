@@ -36,8 +36,14 @@ def gerar_heatmap_correlacao(df):
     """
     Gera um heatmap da matriz de correlação.
     """
+    # Filtra apenas colunas numéricas
+    df_numerico = df.select_dtypes(include=['float64', 'int64'])
+    
+    # Remove valores NaN (se houver)
+    df_numerico = df_numerico.dropna()
+    
     fig, ax = plt.subplots(figsize=(10, 8))
-    sns.heatmap(df.corr(), annot=True, cmap="coolwarm", ax=ax)
+    sns.heatmap(df_numerico.corr(), annot=True, cmap="coolwarm", ax=ax)
     return fig
 
 def detectar_outliers(df, coluna):

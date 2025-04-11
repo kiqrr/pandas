@@ -84,7 +84,8 @@ st.pyplot(fig)
 
 # Generate correlation heatmap
 if st.button("Gerar Heatmap de Correlação"):
-    fig_corr = gerar_heatmap_correlacao(df)
+    df_numerico = df.select_dtypes(include=['float64'])  # Filtra colunas numéricas
+    fig_corr = gerar_heatmap_correlacao(df_numerico)
     st.pyplot(fig_corr)
 
 # Detect outliers
