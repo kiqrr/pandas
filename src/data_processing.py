@@ -1,5 +1,5 @@
 import pandas as pd
-#import numpy as np
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from fpdf import FPDF
@@ -102,16 +102,42 @@ def preencher_valores_faltantes(df, metodo="media"):
 
 def comparar_materias(df, materia1, materia2):
     """
-    Gera gráficos comparativos entre duas matérias.
+    Gera gráficos comparativos entre duas matérias com análise estatística.
     """
     fig, ax = plt.subplots(figsize=(10, 6))
     
-    ax.scatter(df[materia1], df[materia2], alpha=0.7)
+    # Plotagem com cores por status
+    status_cores = {'Aprovado': 'green', 'Recuperação': 'orange', 'Reprovado': 'red'}
+    cores = [status_cores.get(status, 'blue') for status in df['Status']]
     
-    ax.set_xlabel(materia1)
-    ax.set_ylabel(materia2)
+    scatter = ax.scatter(df[materia1], df[materia2], alpha=0.7, c=cores)
     
-    ax.set_title(f"Comparação: {materia1} vs {materia2}")
+    # Correção: Linha diagonal de referência
+    lims = [
+        min(ax.get_xlim()[0], ax.get_ylim()[0]),  # Pega valores escalares
+        max(ax.get_xlim()[1], ax.get_ylim()[1])
+    ]
+    ax.plot([lims[0], lims[1]], [lims[0], lims[1]], 'k--', alpha=0.3, label="Desempenho igual")
+    
+    # Correção: Formatação da linha de tendência
+    z = np.polyfit(df[materia1], df[materia2], 1)
+    p = np.poly1d(z)
+    ax.plot(df[materia1], p(df[materia1]), "r--", alpha=0.7, 
+            label=f"Tendência (y={z[0]:.2f}x+{z[1]:.2f})")
+    
+    # Rotular os pontos com nomes dos alunos
+    for i, aluno in enumerate(df["Aluno"]):
+        ax.annotate(aluno, 
+                   (df[materia1].iloc[i], df[materia2].iloc[i]),
+                   fontsize=8,
+                   xytext=(5, 5), 
+                   textcoords='offset points')
+    
+    ax.set_xlabel(f"Notas em {materia1}")
+    ax.set_ylabel(f"Notas em {materia2}")
+    ax.set_title(f"Comparação de Notas: {materia1} vs {materia2}")
+    ax.legend()
+    ax.grid(True, alpha=0.3)
     
     return fig
 

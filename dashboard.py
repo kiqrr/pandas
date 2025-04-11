@@ -106,11 +106,42 @@ if st.button("Preencher Valores Faltantes"):
         st.dataframe(df)
 
 # Compare subjects
+st.markdown("""
+## Comparação entre Disciplinas
+
+Este gráfico permite analisar a relação entre as notas dos alunos em duas disciplinas diferentes:
+
+- **Cada ponto** representa um aluno (identificado pelo nome)
+- **Cores**: verde = aprovado, laranja = recuperação, vermelho = reprovado
+- **Linha diagonal tracejada**: representa desempenho igual nas duas matérias
+- **Linha de tendência vermelha**: mostra a relação geral entre as notas
+""")
+
 materia1 = st.selectbox("Escolha a primeira matéria", df.columns[1:-1])
 materia2 = st.selectbox("Escolha a segunda matéria", df.columns[1:-1])
+
 if st.button("Comparar Matérias"):
     fig_comparacao = comparar_materias(df, materia1, materia2)
     st.pyplot(fig_comparacao)
+    
+    # Análise estatística automática
+    correlacao = df[materia1].corr(df[materia2]).round(2)
+    st.write(f"**Correlação entre as matérias:** {correlacao}")
+    
+    # Interpretação da correlação
+    if correlacao > 0.7:
+        st.success(f"Existe uma forte correlação positiva ({correlacao}) entre as notas destas disciplinas.")
+    elif correlacao > 0.3:
+        st.info(f"Existe uma correlação moderada ({correlacao}) entre as notas destas disciplinas.")
+    else:
+        st.warning(f"A correlação ({correlacao}) entre as disciplinas é fraca.")
+        
+    # Tabela comparativa
+    st.subheader("Análise Comparativa")
+    dados_comparacao = df[['Aluno', materia1, materia2, 'Status']]
+    dados_comparacao['Diferença'] = (df[materia1] - df[materia2]).abs().round(1)
+    st.dataframe(dados_comparacao.sort_values('Diferença', ascending=False))
+
 
 # Filter by status
 status_selecionado = st.selectbox("Filtrar por Status", ["Aprovado", "Reprovado", "Recuperação"])
