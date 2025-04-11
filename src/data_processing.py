@@ -71,12 +71,34 @@ def exportar_graficos_pdf(graficos, nome_arquivo="relatorio_graficos.pdf"):
 
 def preencher_valores_faltantes(df, metodo="media"):
     """
-    Preenche valores faltantes em todas as colunas numéricas usando o método especificado.
+    Preenche valores faltantes em colunas numéricas usando o método especificado.
     """
+    # Crie uma cópia do DataFrame para não modificar o original
+    df_preenchido = df.copy()
+    
+    # Identifique colunas numéricas
+    colunas_numericas = df.select_dtypes(include=['float64', 'int64']).columns
+    
+    # Preencha valores faltantes em colunas numéricas
     if metodo == "media":
-        return df.fillna(df.mean())
+        for coluna in colunas_numericas:
+            # Verifica se há valores NaN na coluna antes de preencher
+            if df_preenchido[coluna].isna().any():
+                df_preenchido[coluna] = df_preenchido[coluna].fillna(df[coluna].mean())
     elif metodo == "mediana":
-        return df.fillna(df.median())
+        for coluna in colunas_numericas:
+            if df_preenchido[coluna].isna().any():
+                df_preenchido[coluna] = df_preenchido[coluna].fillna(df[coluna].median())
+    
+    # Para colunas não-numéricas (opcionalmente)
+    colunas_texto = df.select_dtypes(include=['object']).columns
+    for coluna in colunas_texto:
+        # Preencher com o valor mais frequente (moda)
+        if df_preenchido[coluna].isna().any():
+            valor_mais_comum = df[coluna].mode()[0]
+            df_preenchido[coluna] = df_preenchido[coluna].fillna(valor_mais_comum)
+    
+    return df_preenchido
 
 def comparar_materias(df, materia1, materia2):
     """

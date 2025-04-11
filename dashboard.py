@@ -97,8 +97,13 @@ if st.button("Detectar Outliers"):
 # Fill missing values
 metodo_preenchimento = st.selectbox("Escolha o método de preenchimento", ["media", "mediana"])
 if st.button("Preencher Valores Faltantes"):
-    df = preencher_valores_faltantes(df, metodo_preenchimento)
-    st.dataframe(df)
+    # Verifica se há valores NaN no DataFrame
+    if not df.isna().any().any():
+        st.warning("O DataFrame não contém valores ausentes para preencher.")
+    else:
+        df = preencher_valores_faltantes(df, metodo_preenchimento)
+        st.success("Valores ausentes preenchidos com sucesso!")
+        st.dataframe(df)
 
 # Compare subjects
 materia1 = st.selectbox("Escolha a primeira matéria", df.columns[1:-1])
