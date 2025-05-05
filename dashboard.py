@@ -5,6 +5,7 @@ import os
 sys.path.append(os.path.abspath("src"))
 
 from data_processing import gerar_grafico
+from data_processing import comparar_materias
 
 import pandas as pd
 import streamlit as st
@@ -55,14 +56,6 @@ def preencher_valores_faltantes(df, metodo="media"):
     elif metodo == "mediana":
         return df.fillna(df.median())
 
-def comparar_materias(df, materia1, materia2):
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.scatter(df[materia1], df[materia2], alpha=0.7)
-    ax.set_xlabel(materia1)
-    ax.set_ylabel(materia2)
-    ax.set_title(f"Comparação: {materia1} vs {materia2}")
-    return fig
-
 def filtrar_por_status(df, status):
     return df[df["Status"] == status]
 
@@ -89,8 +82,8 @@ if st.button("Gerar Heatmap de Correlação"):
     st.pyplot(fig_corr)
 
 # Detect outliers
-coluna_outliers = st.selectbox("Escolha a coluna para detectar outliers", df.columns[1:-1])
-if st.button("Detectar Outliers"):
+coluna_outliers = st.selectbox("Escolha a coluna para detectar Espaços vazios na tabela", df.columns[1:-1])
+if st.button("Detectar Espaços vazios na tabela"):
     outliers = detectar_outliers(df, coluna_outliers)
     st.write(outliers)
 
