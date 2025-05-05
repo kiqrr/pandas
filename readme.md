@@ -1,7 +1,7 @@
-cd C:/PASTA_QUE_ESTA_O_PROJETO/pandas
-pip install -r requirements.txt
-
-streamlit run dashboard.py
+> COMO STARTAR O PROJETO: (comandos do terminal)
+> cd C:/PASTA_QUE_ESTA_O_PROJETO/pandas
+> pip install -r requirements.txt
+> streamlit run dashboard.py
 
 > Pandas: Manipulação e análise de dados tabulares (como tabelas do Excel), com funções para importar/exportar arquivos (CSV, Excel), limpar dados e calcular estatísticas.
 > NumPy: Cálculos numéricos eficientes com arrays multidimensionais, base para operações matemáticas complexas em machine learning e ciência de dados.
