@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath("src"))
 from data_processing import gerar_grafico
 from data_processing import comparar_materias
 from data_processing import gerar_relatorio_completo
+from data_processing import detectar_valores_ausentes
 
 import pandas as pd
 import streamlit as st
@@ -82,22 +83,17 @@ if st.button("Gerar Heatmap de Correlação"):
     fig_corr = gerar_heatmap_correlacao(df_numerico)
     st.pyplot(fig_corr)
 
-# Detect outliers
-coluna_outliers = st.selectbox("Escolha a coluna para detectar Espaços vazios na tabela", df.columns[1:-1])
-if st.button("Detectar Espaços vazios na tabela"):
-    outliers = detectar_outliers(df, coluna_outliers)
-    st.write(outliers)
-
-# Fill missing values
-metodo_preenchimento = st.selectbox("Escolha o método de preenchimento", ["media", "mediana"])
-if st.button("Preencher Valores Faltantes"):
-    # Verifica se há valores NaN no DataFrame
-    if not df.isna().any().any():
-        st.warning("O DataFrame não contém valores ausentes para preencher.")
+# Adicionar após a seção de detecção de outliers
+if st.button("Verificar Valores Ausentes"):
+    # Verifica se há valores ausentes em todo o DataFrame
+    valores_ausentes = df.isna().sum()
+    colunas_com_ausentes = valores_ausentes[valores_ausentes > 0]
+    
+    if len(colunas_com_ausentes) > 0:
+        st.write("Colunas com valores ausentes:")
+        st.write(colunas_com_ausentes)
     else:
-        df = preencher_valores_faltantes(df, metodo_preenchimento)
-        st.success("Valores ausentes preenchidos com sucesso!")
-        st.dataframe(df)
+        st.success("Não foram encontrados valores ausentes no DataFrame!")
 
 # Compare subjects
 st.markdown("""

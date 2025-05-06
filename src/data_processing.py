@@ -281,3 +281,18 @@ def gerar_relatorio_completo(df, nome_arquivo="relatorio_completo.pdf"):
         os.remove("temp_heatmap.png")
     
     return nome_arquivo
+
+def detectar_valores_ausentes(df, coluna=None):
+    """
+    Detecta valores ausentes em uma coluna específica ou em todo o DataFrame.
+    """
+    if coluna:
+        # Verificar apenas na coluna especificada
+        valores_ausentes = df[df[coluna].isna()]
+        contagem = df[coluna].isna().sum()
+        return valores_ausentes, contagem
+    else:
+        # Verificar em todo o DataFrame
+        contagem_por_coluna = df.isna().sum()
+        colunas_com_ausentes = contagem_por_coluna[contagem_por_coluna > 0]
+        return colunas_com_ausentes
