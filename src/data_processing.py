@@ -153,3 +153,131 @@ def calcular_estatisticas_por_grupo(df, grupo, coluna):
     """
     estatisticas = df.groupby(grupo)[coluna].agg(["mean", "median"])
     return estatisticas
+
+def gerar_relatorio_completo(df, nome_arquivo="relatorio_completo.pdf"):
+    """
+    Gera um relatório completo com todas as análises em um único PDF.
+    """
+    # Criar o objeto PDF
+    pdf = FPDF()
+    pdf.add_page()
+    
+    # Adicionar título
+    pdf.set_font('Arial', 'B', 16)
+    pdf.cell(190, 10, 'Relatório Completo de Análise de Notas Escolares', 0, 1, 'C')
+    pdf.ln(10)
+    
+    # Resumo dos dados
+    pdf.set_font('Arial', 'B', 14)
+    pdf.cell(190, 10, '1. Resumo dos Dados', 0, 1, 'L')
+    pdf.set_font('Arial', '', 12)
+    
+    # Informações básicas
+    pdf.cell(190, 10, f"Total de alunos: {len(df)}", 0, 1, 'L')
+    pdf.cell(190, 10, f"Disciplinas analisadas: {', '.join(df.columns[1:-1])}", 0, 1, 'L')
+    
+    # Estatísticas por disciplina
+    pdf.ln(5)
+    pdf.set_font('Arial', 'B', 14)
+    pdf.cell(190, 10, '2. Estatísticas por Disciplina', 0, 1, 'L')
+    
+    # Tabela de estatísticas
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(50, 10, 'Disciplina', 1, 0, 'C')
+    pdf.cell(35, 10, 'Média', 1, 0, 'C')
+    pdf.cell(35, 10, 'Mediana', 1, 0, 'C')
+    pdf.cell(35, 10, 'Mínimo', 1, 0, 'C')
+    pdf.cell(35, 10, 'Máximo', 1, 1, 'C')
+    
+    # Preencher tabela com dados
+    for materia in df.columns[1:-1]:
+        pdf.cell(50, 10, materia, 1, 0, 'L')
+        pdf.cell(35, 10, f"{df[materia].mean():.2f}", 1, 0, 'C')
+        pdf.cell(35, 10, f"{df[materia].median():.2f}", 1, 0, 'C')
+        pdf.cell(35, 10, f"{df[materia].min():.2f}", 1, 0, 'C')
+        pdf.cell(35, 10, f"{df[materia].max():.2f}", 1, 1, 'C')
+    
+    # Gráficos para cada matéria
+    for materia in df.columns[1:-1]:
+        pdf.ln(5)
+        pdf.set_font('Arial', 'B', 14)
+        pdf.cell(190, 10, f'3. Análise de {materia}', 0, 1, 'L')
+        
+        # Gerar e adicionar gráfico
+        fig = gerar_grafico(df, materia)
+        plt.savefig(f"temp_grafico_{materia}.png")
+        plt.close(fig)
+        pdf.image(f"temp_grafico_{materia}.png", x=10, w=180)
+        
+        # Adicionar estatísticas
+        pdf.ln(5)
+        pdf.set_font('Arial', '', 12)
+        stats = calcular_estatisticas(df, materia)
+        pdf.cell(190, 10, f"Média: {stats['Média']:.2f} | Mediana: {stats['Mediana']:.2f}", 0, 1, 'L')
+        
+        # Outliers
+        outliers = detectar_outliers(df, materia)
+        if not outliers.empty:
+            pdf.ln(5)
+            pdf.set_font('Arial', 'B', 12)
+            pdf.cell(190, 10, "Alunos com notas atípicas:", 0, 1, 'L')
+            pdf.set_font('Arial', '', 10)
+            for i, row in outliers.iterrows():
+                pdf.cell(190, 10, f"• {row['Aluno']}: {row[materia]:.2f}", 0, 1, 'L')
+    
+    # Análise de correlação
+    pdf.ln(5)
+    pdf.set_font('Arial', 'B', 14)
+    pdf.cell(190, 10, '4. Análise de Correlação', 0, 1, 'L')
+    
+    # Gerar heatmap
+    fig_corr = gerar_heatmap_correlacao(df)
+    plt.savefig("temp_heatmap.png")
+    plt.close(fig_corr)
+    pdf.image("temp_heatmap.png", x=10, w=180)
+    
+    # Estatísticas por status
+    pdf.ln(5)
+    pdf.set_font('Arial', 'B', 14)
+    pdf.cell(190, 10, '5. Análise por Status do Aluno', 0, 1, 'L')
+    
+    for materia in df.columns[1:-1]:
+        pdf.ln(5)
+        pdf.set_font('Arial', 'B', 12)
+        pdf.cell(190, 10, f"Desempenho em {materia} por status:", 0, 1, 'L')
+        
+        # Tabela por status
+        stats_by_status = calcular_estatisticas_por_grupo(df, 'Status', materia)
+        pdf.set_font('Arial', '', 10)
+        pdf.cell(60, 10, 'Status', 1, 0, 'C')
+        pdf.cell(65, 10, 'Média', 1, 0, 'C')
+        pdf.cell(65, 10, 'Mediana', 1, 1, 'C')
+        
+        for status, row in stats_by_status.iterrows():
+            pdf.cell(60, 10, status, 1, 0, 'L')
+            pdf.cell(65, 10, f"{row['mean']:.2f}", 1, 0, 'C')
+            pdf.cell(65, 10, f"{row['median']:.2f}", 1, 1, 'C')
+    
+    # Conclusão
+    pdf.ln(5)
+    pdf.set_font('Arial', 'B', 14)
+    pdf.cell(190, 10, '6. Conclusões', 0, 1, 'L')
+    pdf.ln(5)
+    pdf.set_font('Arial', '', 12)
+    
+    # Taxa de aprovação
+    aprovados = (df['Status'] == 'Aprovado').sum()
+    pdf.cell(190, 10, f"Taxa de aprovação: {aprovados/len(df)*100:.1f}%", 0, 1, 'L')
+    
+    # Salvar PDF
+    pdf.output(nome_arquivo)
+    
+    # Limpar arquivos temporários
+    import os
+    for materia in df.columns[1:-1]:
+        if os.path.exists(f"temp_grafico_{materia}.png"):
+            os.remove(f"temp_grafico_{materia}.png")
+    if os.path.exists("temp_heatmap.png"):
+        os.remove("temp_heatmap.png")
+    
+    return nome_arquivo

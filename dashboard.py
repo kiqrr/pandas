@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath("src"))
 
 from data_processing import gerar_grafico
 from data_processing import comparar_materias
+from data_processing import gerar_relatorio_completo
 
 import pandas as pd
 import streamlit as st
@@ -148,3 +149,30 @@ coluna_grupo = st.selectbox("Escolha a coluna para calcular estatísticas", df.c
 if st.button("Calcular Estatísticas por Grupo"):
     estatisticas_grupo = calcular_estatisticas_por_grupo(df, grupo, coluna_grupo)
     st.write(estatisticas_grupo)
+
+# Adicionar seção de relatório completo
+st.markdown("---")
+st.header("Relatório Completo")
+st.markdown("""
+Esta funcionalidade gera um PDF com todas as análises dos dados:
+- Resumo estatístico
+- Gráficos de distribuição para cada matéria
+- Análise de correlação entre disciplinas
+- Estatísticas por status do aluno
+- Outliers e pontos notáveis
+- Conclusões
+""")
+
+if st.button("Gerar Relatório Completo"):
+    with st.spinner("Gerando relatório... Aguarde um momento"):
+        nome_arquivo = gerar_relatorio_completo(df)
+        st.success(f"Relatório gerado com sucesso: {nome_arquivo}")
+        
+        # Opção de download
+        with open(nome_arquivo, "rb") as file:
+            st.download_button(
+                label="Baixar Relatório PDF",
+                data=file,
+                file_name=nome_arquivo,
+                mime="application/pdf"
+            )
