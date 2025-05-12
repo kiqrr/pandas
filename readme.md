@@ -1,9 +1,9 @@
-Grupo Pandas
-Kleber
-Alisson
-Caique
-Carlos Eduardo
-Bruno
+Grupo Pandas:
+- Kleber
+- Alisson
+- Caique
+- Carlos Eduardo
+- Bruno
 
 
 
