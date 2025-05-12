@@ -1,3 +1,12 @@
+Grupo Pandas
+Kleber
+Alisson
+Caique
+Carlos Eduardo
+Bruno
+
+
+
 ▪ COMO STARTAR O PROJETO: (comandos do terminal)
 ▪ cd C:/PASTA_QUE_ESTA_O_PROJETO/pandas
 ▪ pip install -r requirements.txt
